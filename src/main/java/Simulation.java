@@ -2,7 +2,8 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Simulation {
 
@@ -10,17 +11,19 @@ public class Simulation {
     private static final double L = 25;
     private static final double INT_RADIUS = 1;
     private static final double VELOCITY = 0.03;
-    private static final double NOISE_RATIO = 0.2;
+    private static final double NOISE_RATIO = 0.1;
     private static final double DT = 1;
     private static final double MAX_TIME = 600;
     private static final double ANIMATION_DT = 1;
-    private static final double WIDTH = L, HEIGHT = L, DEPTH = 0;
+    private static final double WIDTH = L, HEIGHT = L, DEPTH = L;
 
     private static final int INDEX_X_DIM = (int) Math.ceil(WIDTH / INT_RADIUS);
     private static final int INDEX_Y_DIM = (int) Math.ceil(HEIGHT / INT_RADIUS);
 
     private static List<Particle> particles = new LinkedList<>();
     private static List<Particle>[][] neighborIndex = new List[INDEX_X_DIM][INDEX_Y_DIM];
+    private static List<Double> times = new LinkedList<>();
+    private static List<Double> order_measurements = new LinkedList<>();
 
     public static void main(String[] args) {
         PrintWriter writer = null;
@@ -35,12 +38,13 @@ public class Simulation {
 
         try {
             System.out.println("Starting simulation");
-            writer = new PrintWriter("data/" + N + "_" + L + "_" + NOISE_RATIO + "_" + VELOCITY + "_" + DT + "_simulation.xyz");
+            writer = new PrintWriter("data/" + N + "_" + L + "_" + NOISE_RATIO + "_" + VELOCITY + "_" + DT + "_" + (DEPTH == 0? "2D" : "3D") + "_simulation.xyz");
             writeState(writer);
 
             double totalTime = 0;
             int lastFrame = 1;
 
+            saveMeasures(totalTime);
             while (totalTime < MAX_TIME) {
                 rebuildIndex();
 
@@ -56,6 +60,8 @@ public class Simulation {
                     writeState(writer);
                     lastFrame++;
                 }
+
+                saveMeasures(totalTime);
             }
         }
         catch (Exception e) {
@@ -67,6 +73,8 @@ public class Simulation {
                 writer.close();
         }
 
+        printList(times, "data/" + N + "_" + L + "_" + NOISE_RATIO + "_" + VELOCITY + "_" + DT + "_" + (DEPTH == 0? "2D" : "3D") + "_times.csv");
+        printList(order_measurements, "data/" + N + "_" + L + "_" + NOISE_RATIO + "_" + VELOCITY + "_" + DT + "_" + (DEPTH == 0? "2D" : "3D") + "_order.csv");
     }
 
     private static void initParticles(int n, double width, double height, double depth, double v) {
@@ -77,7 +85,7 @@ public class Simulation {
 
             Particle newParticle = new Particle(particles.size(), x, y, z);
             double theta = Math.random() * 2 * Math.PI;
-            double phi = depth == 0 ? 0 : Math.random() * Math.PI;
+            double phi = depth == 0 ? 0 : Math.random() * 2 * Math.PI;
             newParticle.setVelocity(v, theta, phi);
 
             particles.add(newParticle);
@@ -119,6 +127,31 @@ public class Simulation {
         writer.println(new Particle(-2, WIDTH, HEIGHT, DEPTH));
         for (Particle p : particles) {
             writer.println(p);
+        }
+    }
+
+    private static void saveMeasures(double time) {
+        times.add(time);
+
+        double sum_vx = 0, sum_vy = 0, sum_vz = 0;
+        for (Particle p : particles) {
+            sum_vx += p.u_vx;
+            sum_vy += p.u_vy;
+            sum_vz += p.u_vz;
+        }
+
+        order_measurements.add(Math.sqrt(sum_vx*sum_vx + sum_vy*sum_vy + sum_vz*sum_vz) / particles.size());
+    }
+
+    private static void printList(List<Double> list, String filename) {
+        try {
+            PrintWriter writer = new PrintWriter(filename);
+            for (double d : list) {
+                writer.println(d);
+            }
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
