@@ -1,31 +1,49 @@
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Simulation {
 
-    private static final int N = 300;
-    private static final double L = 25;
-    private static final double INT_RADIUS = 1;
-    private static final double VELOCITY = 0.03;
-    private static final double NOISE_RATIO = 0.1;
-    private static final double DT = 1;
-    private static final double MAX_TIME = 600;
-    private static final double ANIMATION_DT = 1;
-    private static final double WIDTH = L, HEIGHT = L, DEPTH = L;
+    private int N;
+    private double L;
+    private double INT_RADIUS;
+    private double VELOCITY;
+    private double NOISE_RATIO;
+    private double DT;
+    private double MAX_TIME;
+    private double ANIMATION_DT;
+    private double WIDTH, HEIGHT, DEPTH;
 
-    private static final int INDEX_X_DIM = (int) Math.ceil(WIDTH / INT_RADIUS);
-    private static final int INDEX_Y_DIM = (int) Math.ceil(HEIGHT / INT_RADIUS);
+    private int INDEX_X_DIM;
+    private int INDEX_Y_DIM;
 
-    private static List<Particle> particles = new LinkedList<>();
-    private static List<Particle>[][] neighborIndex = new List[INDEX_X_DIM][INDEX_Y_DIM];
-    private static List<Double> times = new LinkedList<>();
-    private static List<Double> order_measurements = new LinkedList<>();
+    private List<Particle> particles;
+    private List<Particle>[][] neighborIndex;
+    private List<Double> times;
+    private List<Double> order_measurements;
 
-    public static void main(String[] args) {
+    public Simulation(int n, double l, double INT_RADIUS, double VELOCITY, double NOISE_RATIO, double DT,
+                      double MAX_TIME, double ANIMATION_DT, boolean three_dimensions) {
+        N = n;
+        L = l;
+        this.INT_RADIUS = INT_RADIUS;
+        this.VELOCITY = VELOCITY;
+        this.NOISE_RATIO = NOISE_RATIO;
+        this.DT = DT;
+        this.MAX_TIME = MAX_TIME;
+        this.ANIMATION_DT = ANIMATION_DT;
+        this.WIDTH = L;
+        this.HEIGHT = L;
+        this.DEPTH = three_dimensions ? L : 0;
+        INDEX_X_DIM = (int) Math.ceil(WIDTH / INT_RADIUS);
+        INDEX_Y_DIM = (int) Math.ceil(HEIGHT / INT_RADIUS);
+        particles = new LinkedList<>();
+        neighborIndex = new List[INDEX_X_DIM][INDEX_Y_DIM];
+        times = new LinkedList<>();
+        order_measurements = new LinkedList<>();
+    }
+
+    public void run() {
         PrintWriter writer = null;
 
         Particle.INT_RADIUS_SQ = INT_RADIUS * INT_RADIUS;
@@ -46,11 +64,11 @@ public class Simulation {
 
             saveMeasures(totalTime);
             while (totalTime < MAX_TIME) {
-                rebuildIndex();
+                //rebuildIndex();
 
                 for (Particle p : particles) {
                     p.move(DT);
-                    List<Particle> neighbors = neighborIndex[(int)(p.x / INT_RADIUS)][(int)(p.y / INT_RADIUS)];
+                    //List<Particle> neighbors = neighborIndex[(int)(p.x / INT_RADIUS)][(int)(p.y / INT_RADIUS)];
                     p.adjustAngle(particles);
                 }
 
@@ -77,7 +95,7 @@ public class Simulation {
         printList(order_measurements, "data/" + N + "_" + L + "_" + NOISE_RATIO + "_" + VELOCITY + "_" + DT + "_" + (DEPTH == 0? "2D" : "3D") + "_order.csv");
     }
 
-    private static void initParticles(int n, double width, double height, double depth, double v) {
+    private void initParticles(int n, double width, double height, double depth, double v) {
         while (particles.size() < n) {
             double x = Math.random() * width;
             double y = Math.random() * height;
@@ -92,7 +110,7 @@ public class Simulation {
         }
     }
 
-    private static void rebuildIndex() {
+    private void rebuildIndex() {
         for (int i = 0; i < INDEX_X_DIM; i++) {
             for (int j = 0; j < INDEX_Y_DIM; j++) {
                 neighborIndex[i][j] = new LinkedList<>();
@@ -120,7 +138,7 @@ public class Simulation {
         }
     }
 
-    private static void writeState(PrintWriter writer) {
+    private void writeState(PrintWriter writer) {
         writer.println(particles.size() + 2);
         writer.println();
         writer.println(new Particle(-1, 0, 0, 0));
@@ -130,7 +148,7 @@ public class Simulation {
         }
     }
 
-    private static void saveMeasures(double time) {
+    private void saveMeasures(double time) {
         times.add(time);
 
         double sum_vx = 0, sum_vy = 0, sum_vz = 0;
@@ -143,7 +161,7 @@ public class Simulation {
         order_measurements.add(Math.sqrt(sum_vx*sum_vx + sum_vy*sum_vy + sum_vz*sum_vz) / particles.size());
     }
 
-    private static void printList(List<Double> list, String filename) {
+    private void printList(List<Double> list, String filename) {
         try {
             PrintWriter writer = new PrintWriter(filename);
             for (double d : list) {
