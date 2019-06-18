@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 PATHS = [
-    '../data/40_3.16_{}_0.03_1.0_2D_order.csv',
-    '../data/100_5.0_{}_0.03_1.0_2D_order.csv',
-    '../data/400_10.0_{}_0.03_1.0_2D_order.csv',
-    '../data/1000_15.81_{}_0.03_1.0_2D_order.csv'
+    '../data/40_2.15_{}_0.03_1.0_3D_order.csv',
+    '../data/100_2.92_{}_0.03_1.0_3D_order.csv',
+    '../data/400_4.64_{}_0.03_1.0_3D_order.csv',
+    '../data/1000_6.3_{}_0.03_1.0_3D_order.csv'
 ]
 LABELS = [
     'N = 40',

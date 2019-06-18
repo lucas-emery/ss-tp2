@@ -66,13 +66,13 @@ public class Particle {
             double r = Math.sqrt(sum_u_vx*sum_u_vx + sum_u_vy*sum_u_vy + sum_u_vz*sum_u_vz);
 
             // Changed noise equation to prevent gimbal lock
-            double new_u_vx = sum_u_vx + NOISE_RATIO * (Math.random() - 0.5) * 2 * r;
-            double new_u_vy = sum_u_vy + NOISE_RATIO * (Math.random() - 0.5) * 2 * r;
-            double new_u_vz = sum_u_vz + NOISE_RATIO * (Math.random() - 0.5) * 2 * r;
+//            double new_u_vx = sum_u_vx + NOISE_RATIO * (Math.random() - 0.5) * 2 * r;
+//            double new_u_vy = sum_u_vy + NOISE_RATIO * (Math.random() - 0.5) * 2 * r;
+//            double new_u_vz = sum_u_vz + NOISE_RATIO * (Math.random() - 0.5) * 2 * r;
 
-//            double new_u_vx = (1 - NOISE_RATIO) * (sum_u_vx / r) + NOISE_RATIO * (Math.random() - 0.5) * 2;
-//            double new_u_vy = (1 - NOISE_RATIO) * (sum_u_vy / r) + NOISE_RATIO * (Math.random() - 0.5) * 2;
-//            double new_u_vz = (1 - NOISE_RATIO) * (sum_u_vz / r) + NOISE_RATIO * (Math.random() - 0.5) * 2;
+            double new_u_vx = (1 - NOISE_RATIO) * (sum_u_vx / r) + NOISE_RATIO * (Math.random() - 0.5) * 2;
+            double new_u_vy = (1 - NOISE_RATIO) * (sum_u_vy / r) + NOISE_RATIO * (Math.random() - 0.5) * 2;
+            double new_u_vz = (1 - NOISE_RATIO) * (sum_u_vz / r) + NOISE_RATIO * (Math.random() - 0.5) * 2;
 
             r = Math.sqrt(new_u_vx*new_u_vx + new_u_vy*new_u_vy + new_u_vz*new_u_vz);
 

@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-PATH = '../data/{}_10.0_0.4_0.03_1.0_2D_order.csv'
+PATH = '../data/{}_10.0_0.4_0.03_1.0_3D_order.csv'
 
 
 orders = []
@@ -9,7 +9,7 @@ densities = []
 for n in ([k * 10 for k in range(1, 21)] + [200 + k * 20 for k in range(1, 16)] + [500 + k * 50 for k in range(1, 11)]):
     file_orders = np.genfromtxt(PATH.format(n))
     orders.append(file_orders[-1])
-    densities.append(n / 100)
+    densities.append(n / 1000)
 
 orders = np.array(orders)
 ma = orders.copy()
